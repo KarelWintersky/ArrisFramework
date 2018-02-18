@@ -1,0 +1,27 @@
+{
+    "name": "karelwintersky/arris",
+    "description": "MicroFramework",
+    "authors": [
+        {
+            "name": "Karel Wintersky",
+            "email": "karel.wintersky@gmail.com"
+        }
+    ],
+    "require": {
+        "pecee/simple-router": "^3.4",
+        "monolog/monolog": "^1.23",
+        "google/recaptcha": "^1.1",
+        "php-curl-class/php-curl-class": "^8.0",
+        "nette/mail": "^2.4",
+        "symfony/var-dumper": "^4.0",
+        "robmorgan/phinx": "^0.9.2"
+    },
+    "autoload": {
+        "files": [
+        ],
+        "psr-4": {
+            "Arris\\"   : "engine/arris"
+        }
+    }
+
+}
