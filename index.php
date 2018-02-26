@@ -10,6 +10,7 @@ require_once 'vendor/autoload.php';
 
 use Engine\Arris\App;
 use Engine\Arris\DB;
+use Engine\Arris\AppLogger as Log;
 
 App::init([
     'config.ini',
@@ -17,18 +18,22 @@ App::init([
     'monolog'   =>  'monolog.ini'
 ]);
 
-$c1 = DB::getConnection();
-$s1 = $c1->query("SELECT 1;");
+if (true) {
+    $c1 = DB::getConnection();
+    $s1 = $c1->query("SELECT 1;");
+
+    dump($s1->fetchColumn());
+
+    $c2 = DB::getConnection('crontasks');
+    $s2 = $c2->query("SELECT COUNT(*) FROM `pastvu_photos`");
+
+    dump($s2->fetchColumn());
+
+    $c3 = DB::getConnection();
+    $s3 = $c3->query("SELECT COUNT(*) FROM `antign_wordstorage`");
+
+    dump($s3->fetchColumn());
+}
 
 
-dump($s1->fetchColumn());
-
-$c2 = DB::getConnection('crontasks');
-$s2 = $c2->query("SELECT COUNT(*) FROM `pastvu_photos`");
-
-dump($s2->fetchColumn());
-
-$c3 = DB::getConnection();
-$s3 = $c3->query("SELECT COUNT(*) FROM `antign_wordstorage`");
-
-dump($s3->fetchColumn());
+Log::alert('Warning');
