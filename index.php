@@ -17,10 +17,9 @@ App::init([
     'monolog'   =>  'monolog.ini'
 ]);
 
-dump(App::$config);
-
 $c1 = DB::getConnection();
 $s1 = $c1->query("SELECT 1;");
+
 
 dump($s1->fetchColumn());
 
@@ -33,5 +32,3 @@ $c3 = DB::getConnection();
 $s3 = $c3->query("SELECT COUNT(*) FROM `antign_wordstorage`");
 
 dump($s3->fetchColumn());
-
-dump($c1 === $c3);
