@@ -20,7 +20,7 @@
         "files": [
         ],
         "psr-4": {
-            "Arris\\"   : "engine/arris"
+            "Engine\\"   : "engine/"
         }
     }
 
