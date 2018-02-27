@@ -8,10 +8,10 @@
  * Date: 27.02.2018, time: 1:11
  */
 
-namespace Engine\Arris;
+namespace Arris;
 
-use Engine\Arris\App;
-use Engine\Arris\DB;
+use Arris\App;
+use Arris\DB;
 
 class VisitLogger
 {

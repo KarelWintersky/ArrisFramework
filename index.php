@@ -8,9 +8,10 @@ define('__CONFIG__', __ROOT__ . '/.config/');
 
 require_once 'vendor/autoload.php';
 
-use Engine\Arris\App;
-use Engine\Arris\DB;
-use Engine\Arris\AppLogger as Log;
+use Arris\App;
+use Arris\DB;
+use Arris\AppLogger as Log;
+use Arris\VisitLogger as VLog;
 
 App::init([
     'config.ini',
@@ -19,7 +20,7 @@ App::init([
     'visitlog'  =>  'visitlog.ini'
 ]);
 
-if (false) {
+if (true) {
     $c1 = DB::getConnection();
     $s1 = $c1->query("SELECT 1;");
 
@@ -36,12 +37,12 @@ if (false) {
     dump($s3->fetchColumn());
 }
 
-if (false) {
+if (true) {
     Log::alert('Warning');
 }
 
 if (true) {
-    $state = \Engine\Arris\VisitLogger::log();
+    $state = VLog::log();
 
     dump($state);
 }

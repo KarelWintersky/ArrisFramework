@@ -8,9 +8,9 @@
  * Date: 26.02.2018, time: 23:44
  */
 
-namespace Engine\Arris;
+namespace Arris;
 
-use Engine\Arris\App;
+use Arris\App;
 use Monolog\Logger;
 use Monolog\Handler\FilterHandler;
 use Monolog\Handler\StreamHandler;

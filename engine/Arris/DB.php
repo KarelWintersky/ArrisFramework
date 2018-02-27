@@ -8,7 +8,7 @@
  * Date: 26.02.2018, time: 7:05
  */
 
-namespace Engine\Arris;
+namespace Arris;
 
 /**
  *

@@ -8,7 +8,7 @@
  * Date: 18.02.2018, time: 16:29
  */
 
-namespace Engine\Arris;
+namespace Arris;
 
 /**
  * Class App
