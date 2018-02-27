@@ -20,7 +20,8 @@
         "files": [
         ],
         "psr-4": {
-            "Arris\\"   : "engine/Arris"
+            "Arris\\"           : "engine/Arris",
+            "Arris\\Websun\\"   : "engine/Arris/Websun"
         }
     }
 

@@ -12,6 +12,7 @@ use Arris\App;
 use Arris\DB;
 use Arris\AppLogger as Log;
 use Arris\VisitLogger as VLog;
+use Arris\WebSunTemplate as Template;
 
 App::init([
     'config.ini',
@@ -20,7 +21,7 @@ App::init([
     'visitlog'  =>  'visitlog.ini'
 ]);
 
-if (true) {
+if (false) {
     $c1 = DB::getConnection();
     $s1 = $c1->query("SELECT 1;");
 
@@ -37,15 +38,28 @@ if (true) {
     dump($s3->fetchColumn());
 }
 
-if (true) {
+if (false) {
     Log::alert('Warning');
 }
 
-if (true) {
+if (false) {
     $state = VLog::log();
 
     dump($state);
 }
+
+if (false) {
+    $template = new Template('login.html', '/srv/webhosts/ArrisFramework/Arris/templates');
+    $template->set('href', [
+        'form_action'       =>  '/auth_callback_login',
+        'frontpage'         =>  '/frontpage'
+    ]);
+
+    echo $template->render();
+}
+
+
+
 
 
 
