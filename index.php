@@ -15,10 +15,11 @@ use Engine\Arris\AppLogger as Log;
 App::init([
     'config.ini',
     'db.ini',
-    'monolog'   =>  'monolog.ini'
+    'monolog'   =>  'monolog.ini',
+    'visitlog'  =>  'visitlog.ini'
 ]);
 
-if (true) {
+if (false) {
     $c1 = DB::getConnection();
     $s1 = $c1->query("SELECT 1;");
 
@@ -35,5 +36,17 @@ if (true) {
     dump($s3->fetchColumn());
 }
 
+if (false) {
+    Log::alert('Warning');
+}
 
-Log::alert('Warning');
+if (true) {
+    $state = \Engine\Arris\VisitLogger::log();
+
+    dump($state);
+}
+
+
+
+
+
