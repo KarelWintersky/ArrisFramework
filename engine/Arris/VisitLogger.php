@@ -3,7 +3,7 @@
  * User: Arris
  *
  * Class VisitLogger
- * Namespace: Engine\Arris
+ * Namespace: Arris
  *
  * Date: 27.02.2018, time: 1:11
  */

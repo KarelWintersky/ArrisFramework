@@ -3,7 +3,7 @@
  * User: Arris
  *
  * Class App
- * Namespace: Engine\Arris
+ * Namespace: Arris
  *
  * Date: 18.02.2018, time: 16:29
  */
@@ -14,7 +14,7 @@ namespace Arris;
  * Class App
  *
  *
- * @package Engine\Arris
+ * @package Arris
  */
 class App
 {

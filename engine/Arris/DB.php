@@ -13,7 +13,7 @@ namespace Arris;
 /**
  *
  * Class DB
- * @package engine\Arris
+ * @package Arris
  */
 class DB
 {

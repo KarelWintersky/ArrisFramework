@@ -3,7 +3,7 @@
  * User: Arris
  *
  * Class WebSunTemplate
- * Namespace: engine\Arris
+ * Namespace: Arris
  *
  * Date: 26.02.2018, time: 23:26
  */

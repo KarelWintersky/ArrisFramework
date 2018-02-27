@@ -15,6 +15,10 @@ use Monolog\Logger;
 use Monolog\Handler\FilterHandler;
 use Monolog\Handler\StreamHandler;
 
+/**
+ * Interface AppLoggerInterface
+ * @package Arris
+ */
 interface AppLoggerInterface {
 
     /**
@@ -87,7 +91,7 @@ interface AppLoggerInterface {
 /**
  *
  * Class AppLogger
- * @package engine\Arris
+ * @package Arris
  */
 class AppLogger implements AppLoggerInterface
 {
