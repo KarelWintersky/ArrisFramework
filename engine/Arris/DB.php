@@ -78,7 +78,7 @@ class DB
         $key = ($prefix === NULL) ? 'NULL' : $prefix;
 
         $config_key
-            = $prefix !== NULL
+            =  $prefix !== NULL
             ?  $prefix . ":database:" . App::get("connection/suffix")
             :             "database:" . App::get("connection/suffix");
 
@@ -129,6 +129,12 @@ class DB
         return true;
     }
 
+    /**
+     *
+     *
+     * @param null $prefix
+     * @return null|string
+     */
     public static function getTablePrefix( $prefix = NULL ) {
 
         $key = ($prefix === NULL) ? 'NULL' : $prefix;
@@ -136,6 +142,25 @@ class DB
         if (!self::checkInstance($prefix)) return NULL;
 
         return array_key_exists('table_prefix', self::$_configs[$key]) ? self::$_configs[$key]['table_prefix'] : '';
+    }
+
+    /**
+     *
+     *
+     * @param $query
+     * @param null $prefix
+     * @return bool|\PDOStatement
+     */
+    public static function query($query, $prefix = NULL) {
+        $state = FALSE;
+
+        try {
+            $state = DB::getConnection($prefix)->query($query);
+        } catch (\PDOException $e) {
+
+        }
+
+        return $state;
     }
 
 }

@@ -14,7 +14,8 @@
         "php-curl-class/php-curl-class": "^8.0",
         "nette/mail": "^2.4",
         "symfony/var-dumper": "^4.0",
-        "robmorgan/phinx": "^0.9.2"
+        "robmorgan/phinx": "^0.9.2",
+        "phpmailer/phpmailer": "^6.0"
     },
     "autoload": {
         "files": [

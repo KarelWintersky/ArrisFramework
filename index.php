@@ -19,7 +19,7 @@ App::init([
     'db.ini',
     'monolog'   =>  'monolog.ini',
     'visitlog'  =>  'visitlog.ini'
-]);
+], '$/.config/');
 
 if (false) {
     $c1 = DB::getConnection();

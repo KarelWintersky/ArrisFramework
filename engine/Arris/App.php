@@ -58,20 +58,22 @@ class App
     /**
      * Init application states with given config files
      *
-     * @param $config
-     * @param string $config_dir
+     * @param $configs_set
+     * @param string $configs_dir
      */
-    public static function init($config, $config_dir = __CONFIG__)
+    public static function init($configs_set, $configs_dir = '')
     {
-        self::$_root = $dir = __ROOT__;
+        $cfg_dir = ($configs_dir != '')
+            ? preg_replace('/^\$/', __ROOT__, $configs_dir)
+            : __CONFIG__;
 
-        if (is_array($config)) {
-            foreach ($config as $config_key => $ini_file) {
+        if (is_array($configs_set)) {
+            foreach ($configs_set as $config_key => $ini_file) {
                 $config_subpath = is_int($config_key) ? '' : $config_key;
-                self::config_append( $config_dir . $ini_file , $config_subpath );
+                self::config_append( $cfg_dir . $ini_file , $config_subpath );
             }
-        } elseif (is_string($config)) {
-            self::config_append( $config_dir . $config);
+        } elseif (is_string($configs_set)) {
+            self::config_append( $cfg_dir . $configs_set);
         }
     }
 
