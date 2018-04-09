@@ -1,8 +1,8 @@
 .todo
 .idea
-.config
-.config/config.ini
-.config/db.ini
-.config/phpauth.ini
+config
+config/config.ini
+config/db.ini
+config/phpauth.ini
 composer.lock
 vendor

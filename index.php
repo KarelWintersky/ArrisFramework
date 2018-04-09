@@ -14,12 +14,15 @@ use Arris\AppLogger as Log;
 use Arris\VisitLogger as VLog;
 use Arris\WebSunTemplate as Template;
 
+use Arris\Auth;
+
 App::init([
     'config.ini',
     'db.ini',
     'monolog'   =>  'monolog.ini',
-    'visitlog'  =>  'visitlog.ini'
-], '$/.config/');
+    'visitlog'  =>  'visitlog.ini',
+    'phpauth'   =>  'phpauth.ini'
+], '$/config/');
 
 if (false) {
     $c1 = DB::getConnection();
@@ -58,6 +61,13 @@ if (false) {
     echo $template->render();
 }
 
+// Auth::getInstance()->login('aaa@b.com', 'xxxxx');
+
+Auth::login('aaa@b.com', 'xxxxx');
+
+Auth::register('aaa@b.com', 'xxx', 'yyy');
+
+var_dump( Auth::getInstance()->isLogged() );
 
 
 
