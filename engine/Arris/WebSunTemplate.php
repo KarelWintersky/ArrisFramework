@@ -10,7 +10,21 @@
 
 namespace Arris;
 
-use Arris\Websun as websun;
+//пока websun-пакет не заружается через композер - используем локальную версию
+
+use Arris\Websun\websun as websun;
+
+
+/*
+use Websun\websun as websun;
+
+требует /engine/Websun/websun.php с неймспейсом "namespace Websun;"
+и определением в composer.json:
+"psr-4": {
+            "Websun\\"          : "engine/Websun"
+        }
+
+ */
 
 /**
  * WebSun Template Facade
@@ -57,7 +71,7 @@ class WebSunTemplate
 
             if ($this->template_path === '' && $this->template_file === '') return false;
 
-            return websun\websun::websun_parse_template_path( $this->template_data, $this->template_file, $this->template_path );
+            return websun::websun_parse_template_path( $this->template_data, $this->template_file, $this->template_path );
 
         } elseif ($this->render_type === 'json') {
             return json_encode( $this->template_data );

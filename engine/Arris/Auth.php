@@ -39,7 +39,7 @@ class Auth
 
     public function __construct()
     {
-        $config = new PHPAuthConfig( App::get('phpauth') );
+        $config = new PHPAuthConfig( App::get('phpauth') , App::get('google_recaptcha', []));
 
         self::$phpauth = new PHPAuth( DB::getConnection( App::get('phpauth/db_prefix', NULL) ), $config );
     }

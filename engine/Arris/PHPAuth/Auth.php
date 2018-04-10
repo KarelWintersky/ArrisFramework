@@ -13,6 +13,7 @@
 namespace Arris\PHPAuth;
 
 use PHPMailer\PHPMailer\PHPMailer;
+use ReCaptcha\ReCaptcha;
 
 
 /**
@@ -30,7 +31,9 @@ class Auth
      */
     private $dbh;
     public $config;
+
     public $lang;
+    public $recaptcha;
 
 
     /**
@@ -42,6 +45,7 @@ class Auth
         $this->dbh = $dbh;
         $this->config = $config;
         $this->lang = $config->dictionary;
+        $this->recaptcha = $config->recaptcha;
 
         date_default_timezone_set($this->config->site_timezone);
     }
@@ -52,17 +56,17 @@ class Auth
      * @param string $email
      * @param string $password
      * @param bool|false $remember
-     * @param string $captcha
+     * @param string $captcha_response
      * @return array $return
      */
-    public function login($email, $password, $remember = false, $captcha = NULL)
+    public function login($email, $password, $remember = false, $captcha_response = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
-                $return['message'] = $this->lang["user_verify_failed"];
+            if ($this->checkCaptcha($captcha_response) == false) {
+                $return['message'] = $this->lang["captcha_verify_failed"]; //@todo: rename to 'captcha_verify_failed'
                 return $return;
             }
         }
@@ -76,15 +80,15 @@ class Auth
 
         if ($validateEmail['error'] == 1) {
             $this->addAttempt();
-            $return['message'] = $this->lang["user_validate_email_incorrect"];
+            $return['message'] = $this->lang["user_validate_email_incorrect"]; // was email password invalid
             return $return;
         } elseif ($validatePassword['error'] == 1) {
             $this->addAttempt();
-            $return['message'] = $this->lang["user_validate_password_incorrect"];
+            $return['message'] = $this->lang["user_validate_password_incorrect"]; // was email password invalid
             return $return;
         } elseif ($remember != 0 && $remember != 1) {
             $this->addAttempt();
-            $return['message'] = $this->lang["user_validate_remember_me_invalid"];
+            $return['message'] = $this->lang["user_validate_remember_me_invalid"]; // was remember_me_invalid
             return $return;
         }
 
@@ -93,7 +97,7 @@ class Auth
         if (!$uid) {
             $this->addAttempt();
 
-            $return['message'] = $this->lang["user_validate_user_not_found"];
+            $return['message'] = $this->lang["user_validate_user_not_found"]; // was email_password_incorrect
             return $return;
         }
 
@@ -102,14 +106,14 @@ class Auth
         if (!password_verify($password, $user['password'])) {
             $this->addAttempt();
 
-            $return['message'] = $this->lang["user_login_incorrect_password"];
+            $return['message'] = $this->lang["user_login_incorrect_password"]; // was email_password_incorrect
             return $return;
         }
 
         if ($user['isactive'] != 1) {
             $this->addAttempt();
 
-            $return['message'] = $this->lang["user_login_account_inactive"];
+            $return['message'] = $this->lang["user_login_account_inactive"]; // was account_inactive
             return $return;
         }
 
@@ -697,8 +701,8 @@ class Auth
 
         $block_status = $this->isBlocked();
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
-                $return['message'] = $this->lang["user_verify_failed"];
+            if ($this->checkReCaptcha($captcha) == false) {
+                $return['message'] = $this->lang["captcha_verify_failed"];
                 return $return;
             }
         }
@@ -898,6 +902,34 @@ class Auth
      */
     private function checkCaptcha($captcha)
     {
+        return true;
+    }
+
+
+    /**
+     * Проверяет код Google Recaptcha
+     * Если использование капчи в конфиге отключено - всегда возвращается TRUE
+     *
+     * @param $captcha_response
+     * @return bool
+     */
+    private function checkReCaptcha($captcha_response)
+    {
+        if ($this->recaptcha['enable'] == FALSE) return true;
+
+        if ($this->recaptcha['enable']) {
+
+            if (empty($this->recaptcha['secret_key'])) throw new \RuntimeException('No secret provided');
+            if (!is_string($this->recaptcha['secret_key'])) throw new \RuntimeException('The provided secret must be a string');
+
+            $recaptcha = new ReCaptcha($this->recaptcha['secret_key']);
+            $checkout = $recaptcha->verify($captcha_response, $this->getIp());
+
+            if (!$checkout->isSuccess()) {
+                return false;
+            }
+        }
+
         return true;
     }
 

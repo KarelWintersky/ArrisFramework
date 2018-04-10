@@ -51,7 +51,7 @@ if (false) {
     dump($state);
 }
 
-if (false) {
+if (true) {
     $template = new Template('login.html', '/srv/webhosts/ArrisFramework/Arris/templates');
     $template->set('href', [
         'form_action'       =>  '/auth_callback_login',
