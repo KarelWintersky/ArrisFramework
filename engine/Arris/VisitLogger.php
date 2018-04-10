@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class VisitLogger
  * Namespace: Arris
@@ -13,8 +13,16 @@ namespace Arris;
 use Arris\App;
 use Arris\DB;
 
+/**
+ *
+ *
+ * Class VisitLogger
+ * @package Arris
+ */
 class VisitLogger
 {
+    const VERSION = '1.2';
+
     const QUERY_DEFINITION_UNIQS = <<<QUERY_DEFINITION_UNIQS
 CREATE TABLE IF NOT EXISTS `%s` (
   `id`              INT(11) NOT NULL AUTO_INCREMENT,
@@ -76,7 +84,10 @@ QUERY_INSERT_ALL;
     private static $target_db_all  = NULL;
 
 
-
+    /**
+     *
+     * @return null|string
+     */
     private static function getIP()
     {
         if (php_sapi_name() === 'cli') return '127.0.0.1';
@@ -96,6 +107,10 @@ QUERY_INSERT_ALL;
         return filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ? $_SERVER['REMOTE_ADDR'] : NULL;
     }
 
+    /**
+     *
+     * @return bool
+     */
     private static function checkValidConfig() {
         if (!App::get('visitlog')) return FALSE;
 
@@ -148,6 +163,9 @@ QUERY_INSERT_ALL;
      }
 
 
+    /**
+     *
+     */
     private static function log_to_file() {
         if (self::$is_log_all) {
 
@@ -178,6 +196,10 @@ QUERY_INSERT_ALL;
 
     }
 
+    /**
+     * @param $db_prefix
+     * @return bool|int|mixed
+     */
     private static function log_to_database($db_prefix){
         $insert_state = TRUE;
 
@@ -230,15 +252,15 @@ QUERY_INSERT_ALL;
         return $insert_state;
     }
 
+    /**
+     *
+     */
     private static function log_to_monolog()
     {
     }
 
 
 
-    /**
-     *
-     */
     /**
      * Ожидает наличие секции visitlog в глобальном конфиге
      *

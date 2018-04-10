@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class Config
  * Namespace: Arris\PHPAuth
@@ -10,6 +10,11 @@
 
 namespace Arris\PHPAuth;
 
+/**
+ *
+ * Class Config
+ * @package Arris\PHPAuth
+ */
 class Config
 {
     protected $config;
@@ -25,6 +30,7 @@ class Config
         if (file_exists($path)) {
             $dictionary = parse_ini_file($path);
         } else {
+            //@todo: monolog
             die("<strong>FATAL ERROR:</strong> PHPAuth language file `{$path}` not found or not exists. ");
         }
 

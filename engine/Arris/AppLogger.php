@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class Logger
  * Namespace: engine\Arris
@@ -20,6 +20,7 @@ use Monolog\Handler\StreamHandler;
  * @package Arris
  */
 interface AppLoggerInterface {
+    const VERSION = '1.2';
 
     /**
      * DEBUG (100): Detailed debug information.

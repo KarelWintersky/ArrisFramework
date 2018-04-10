@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class Auth
  * Namespace: Arris

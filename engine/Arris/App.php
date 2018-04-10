@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class App
  * Namespace: Arris
@@ -18,6 +18,7 @@ namespace Arris;
  */
 class App
 {
+    const VERSION = '0.2';
     /**
      * Configuration keys path separator
      */

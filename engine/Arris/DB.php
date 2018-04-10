@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class DB
  * Namespace: engine\Arris
@@ -17,6 +17,8 @@ namespace Arris;
  */
 class DB
 {
+    const VERSION = '1.1';
+
     private static $_instances = [
     ];
 
@@ -40,6 +42,7 @@ class DB
 
         return ( array_key_exists($key, self::$_instances) && self::$_instances[$key] !== NULL  );
     }
+
 
     public static function getInstance($prefix = NULL):DB {
 

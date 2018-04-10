@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky
  *
  * Class WebSunTemplate
  * Namespace: Arris
@@ -12,8 +12,16 @@ namespace Arris;
 
 use Arris\Websun as websun;
 
+/**
+ * WebSun Template Facade
+ *
+ * Class WebSunTemplate
+ * @package Arris
+ */
 class WebSunTemplate
 {
+    const VERSION = '1.2';
+
     const ALLOWED_RENDERS = array('html', 'json', 'null');
 
     public $template_file;
@@ -23,8 +31,6 @@ class WebSunTemplate
     private $render_type;
     private $http_status;
     private $data = array();
-
-
 
     /**
      * @param $file
@@ -106,6 +112,7 @@ class WebSunTemplate
                 $result = array_merge_recursive($result, $value);
             }
         }
+        return true;
     }
 
 
@@ -139,6 +146,11 @@ class WebSunTemplate
         return $result;
     }
 
+    /**
+     *
+     *
+     * @return mixed|null|string
+     */
     public function content()
     {
         return $this->render();
