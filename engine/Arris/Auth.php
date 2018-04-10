@@ -26,10 +26,7 @@ class Auth
     public static function getInstance():PHPAuth
     {
         if (!self::checkInstance()) {
-            var_dump('creating new instance');
             self::init();
-        } else {
-            var_dump('using existing instance');
         }
 
         return self::$phpauth;
@@ -52,8 +49,6 @@ class Auth
 
     public static function __callStatic($method, $args)
     {
-        // self::$phpauth->$method(...$args);
-
         return self::getInstance()->$method(...$args);
     }
 

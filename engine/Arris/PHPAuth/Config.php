@@ -78,6 +78,25 @@ class Config
     }
 
     /**
+     *
+     *
+     * @param $name
+     * @param $args
+     * @return bool
+     */
+    public function __call($name, $args)
+    {
+        if ($name == 'get') {
+            return $this->config[$args[0]];
+        } elseif ($name == 'getAll') {
+            return $this->config;
+        } else {
+            var_dump('Called undefined method: ' . $name);
+            return false;
+        }
+    }
+
+    /**
      * Danger foreseen is half avoided.
      *
      * Set default values.
@@ -125,8 +144,6 @@ class Config
             $this->config['mail_charset'] = "UTF-8";
         }
     }
-
-
 
 
 }

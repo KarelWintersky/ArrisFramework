@@ -22,7 +22,7 @@ App::init([
     'monolog'   =>  'monolog.ini',
     'visitlog'  =>  'visitlog.ini',
     'phpauth'   =>  'phpauth.ini'
-], '$/config/');
+], '$/.config/');
 
 if (false) {
     $c1 = DB::getConnection();
@@ -67,7 +67,6 @@ Auth::login('aaa@b.com', 'xxxxx');
 
 Auth::register('aaa@b.com', 'xxx', 'yyy');
 
-var_dump( Auth::getInstance()->isLogged() );
 
 
 
