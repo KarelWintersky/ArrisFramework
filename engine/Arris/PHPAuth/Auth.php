@@ -883,28 +883,36 @@ class Auth
             return $query->execute(['ip' => $ip]);
         }
 
-        $currentdate = time();      // было $currentdate = strtotime(date("Y-m-d H:i:s"));
+        $sth = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip) AND NOW() > expiredate ");
+
+        return $sth->execute([
+            'ip'    =>  $ip
+        ]);
+    }
+
+    /**
+     * OLD, UNOPTIMIZED CODE
+     * @param $ip
+     * @param bool|false $all
+     * @return bool
+     */
+    public function _deleteAttempts($ip, $all = false)
+    {
+        if ($all == true) {
+            $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
+            return $query->execute(['ip' => $ip]);
+        }
+
+        $currentdate = time();
         $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = :id");
 
-        // получаем все возможные "попытки входа"
         $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
         $query->execute(['ip' => $ip]);
 
-        // $row['expiredate'] contains DATETIME and have type STRING
-
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
-
-        dump($row);
-
-        dump(gettype($row['expiredate']));
-
-        while ($row) {
-            $expiredate = strtotime($row['expiredate']);
-            /*if ($currentdate > $expiredate) {
-                $queryDel->execute(['id' => $row['id']]);
-            }*/
-            $row = $query->fetch(\PDO::FETCH_ASSOC);
-            dump($row);
+        $rows = $query->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            $expiredate = strtotime( $row['expiredate'] );
+            if ($currentdate > $expiredate) { $queryDel->execute(['id' => $row['id']]); }
         }
         return true;
     }
