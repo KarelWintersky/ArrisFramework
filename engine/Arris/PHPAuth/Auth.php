@@ -878,49 +878,18 @@ class Auth
      */
     public function deleteAttempts($ip, $all = false)
     {
-        if ($all == true) {
-            $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
-            return $query->execute(['ip' => $ip]);
-        }
+        $query = ($all)
+            ? "DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)"
+            : "DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip) AND NOW() > expiredate ";
 
-        $sth = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip) AND NOW() > expiredate ");
-
+        $sth = $this->dbh->prepare($query);
         return $sth->execute([
-            'ip'    =>  $ip
+            'ip' => $ip
         ]);
     }
 
     /**
-     * OLD, UNOPTIMIZED CODE
-     * @param $ip
-     * @param bool|false $all
-     * @return bool
-     */
-    public function _deleteAttempts($ip, $all = false)
-    {
-        if ($all == true) {
-            $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
-            return $query->execute(['ip' => $ip]);
-        }
-
-        $currentdate = time();
-        $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = :id");
-
-        $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
-        $query->execute(['ip' => $ip]);
-
-        $rows = $query->fetchAll(\PDO::FETCH_ASSOC);
-        foreach ($rows as $row) {
-            $expiredate = strtotime( $row['expiredate'] );
-            if ($currentdate > $expiredate) { $queryDel->execute(['id' => $row['id']]); }
-        }
-        return true;
-    }
-
-
-    /**
      * Verifies a captcha code
-     * @todo: учитывать конфиг. Если в конфиге капча отключена- всегда возвращается TRUE
      *
      * @param $captcha
      * @return bool
