@@ -343,7 +343,7 @@ class Auth
             return false;
         }
 
-        $query = $this->dbh->prepare("SELECT id, uid, expiredate, INET_ATON(ip) as ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query = $this->dbh->prepare("SELECT id, uid, expiredate, INET_NTOA(ip) as ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash");
         $query_params = [
             'hash' => $hash
         ];
@@ -849,7 +849,7 @@ class Auth
      *
      * @return mixed
      */
-    private function getIp()
+    public function getIp()
     {
         if (getenv('HTTP_CLIENT_IP')) {
             $ipAddress = getenv('HTTP_CLIENT_IP');
@@ -872,29 +872,39 @@ class Auth
 
     /**
      * Deletes (all) attempts for a given IP from database
-     * @param $ip
+     * @param string $ip
      * @param bool|false $all
      * @return bool
      */
-    private function deleteAttempts($ip, $all = false)
+    public function deleteAttempts($ip, $all = false)
     {
         if ($all == true) {
             $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
             return $query->execute(['ip' => $ip]);
         }
 
+        $currentdate = time();      // было $currentdate = strtotime(date("Y-m-d H:i:s"));
+        $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = :id");
+
+        // получаем все возможные "попытки входа"
         $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = INET_ATON(:ip)");
         $query->execute(['ip' => $ip]);
 
+        // $row['expiredate'] contains DATETIME and have type STRING
+
         $row = $query->fetch(\PDO::FETCH_ASSOC);
+
+        dump($row);
+
+        dump(gettype($row['expiredate']));
+
         while ($row) {
             $expiredate = strtotime($row['expiredate']);
-            $currentdate = strtotime(date("Y-m-d H:i:s"));
-            if ($currentdate > $expiredate) {
-                $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = :id");
+            /*if ($currentdate > $expiredate) {
                 $queryDel->execute(['id' => $row['id']]);
-            }
+            }*/
             $row = $query->fetch(\PDO::FETCH_ASSOC);
+            dump($row);
         }
         return true;
     }

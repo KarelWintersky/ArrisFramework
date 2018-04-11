@@ -91,6 +91,7 @@ class Auth implements AuthArrisInterface
         if (!$auth_result['error']) {
             setcookie($instance->config->cookie_name, $auth_result['hash'], time()+$auth_result['expire'], $instance->config->cookie_path);
             self::unsetcookie(App::get('phpauth_cookies/new_registered_userlogin'));
+            $auth_result['method'] = __METHOD__;
         }
 
         return $auth_result;

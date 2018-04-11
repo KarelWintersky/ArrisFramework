@@ -39,30 +39,40 @@ SimpleRouter::get('/', function(){
 });
 
 SimpleRouter::get('/whoami', function(){
-    $is_logged = Auth::isLogged();
+    echo 'cookie <br/>';
+    // dump($_COOKIE);
 
-    var_dump($is_logged);
+    /*if (Auth::isLogged()) {
+        echo 'Auth::getCurrentUserInfo() <br>';
+        // dump( Auth::getCurrentUserInfo() );
+    } else {
+        echo 'Not logged';
+    }*/
+
+
+    Auth::getInstance()->deleteAttempts( Auth::getInstance()->getIP() );
+
 });
 
 SimpleRouter::get('/login', function(){
     $auth_result = Auth::login('karel.wintersky@yandex.ru', 'password', 1);
 
-    var_dump($auth_result);
+    dump($auth_result);
 });
 
 SimpleRouter::get('/logout', function(){
     $status = Auth::logout();
 
-    var_dump($status);
+    dump($status);
 });
 
 SimpleRouter::get('/register', function(){
     $status = Auth::register('karel.wintersky@yandex.ru', 'password', 'password');
-    var_dump($status);
+    dump($status);
 });
 
 SimpleRouter::get('/test', function(){
-    var_dump('test');
+    dump('test');
 });
 
 SimpleRouter::get('/template', function(){
@@ -88,3 +98,4 @@ SimpleRouter::get('/template', function(){
 
 SimpleRouter::start();
 
+echo PHP_EOL, '<br/><a href="/">Back...</a>';
