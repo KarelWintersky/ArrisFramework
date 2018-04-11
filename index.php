@@ -1,19 +1,23 @@
 <?php
 /**
  * User: Arris
- * Date: 18.02.2018, time: 16:10
+ * Date: 10.04.2018, time: 20:29
  */
+
 define('__ROOT__', __DIR__);
-define('__CONFIG__', __ROOT__ . '/.config/');
+define('__CONFIG__', __ROOT__ . '/config/');
 
 require_once 'vendor/autoload.php';
 
+require_once 'engine/core.helpers.php';
+require_once 'engine/core.functions.php';
+
+use Pecee\SimpleRouter\SimpleRouter;
 use Arris\App;
 use Arris\DB;
 use Arris\AppLogger as Log;
 use Arris\VisitLogger as VLog;
 use Arris\WebSunTemplate as Template;
-
 use Arris\Auth;
 
 App::init([
@@ -24,53 +28,63 @@ App::init([
     'phpauth'   =>  'phpauth.ini'
 ], '$/.config/');
 
-if (false) {
-    $c1 = DB::getConnection();
-    $s1 = $c1->query("SELECT 1;");
+SimpleRouter::get('/', function(){
+    $template = new Template('index.html', __DIR__ . '/templates');
 
-    dump($s1->fetchColumn());
+    $userinfo = Auth::getCurrentUserInfo();
 
-    $c2 = DB::getConnection('crontasks');
-    $s2 = $c2->query("SELECT COUNT(*) FROM `pastvu_photos`");
+    $template->set('userinfo', $userinfo);
 
-    dump($s2->fetchColumn());
+    echo $template->render(), PHP_EOL;
+});
 
-    $c3 = DB::getConnection();
-    $s3 = $c3->query("SELECT COUNT(*) FROM `antign_wordstorage`");
+SimpleRouter::get('/whoami', function(){
+    $is_logged = Auth::isLogged();
 
-    dump($s3->fetchColumn());
-}
+    var_dump($is_logged);
+});
 
-if (false) {
-    Log::alert('Warning');
-}
+SimpleRouter::get('/login', function(){
+    $auth_result = Auth::login('karel.wintersky@yandex.ru', 'password', 1);
 
-if (false) {
-    $state = VLog::log();
+    var_dump($auth_result);
+});
 
-    dump($state);
-}
+SimpleRouter::get('/logout', function(){
+    $status = Auth::logout();
 
-if (true) {
-    $template = new Template('login.html', '/srv/webhosts/ArrisFramework/Arris/templates');
-    $template->set('href', [
-        'form_action'       =>  '/auth_callback_login',
-        'frontpage'         =>  '/frontpage'
+    var_dump($status);
+});
+
+SimpleRouter::get('/register', function(){
+    $status = Auth::register('karel.wintersky@yandex.ru', 'password', 'password');
+    var_dump($status);
+});
+
+SimpleRouter::get('/test', function(){
+    var_dump('test');
+});
+
+SimpleRouter::get('/template', function(){
+    $template = new Template('template1.html', __DIR__ . '/templates');
+    $template->set('', [
+        'value1'    =>  1,
+        'value2'    =>  2
     ]);
 
-    echo $template->render();
-}
+    echo $template->render(), PHP_EOL;
 
-// Auth::getInstance()->login('aaa@b.com', 'xxxxx');
-
-Auth::login('aaa@b.com', 'xxxxx');
-
-Auth::register('aaa@b.com', 'xxx', 'yyy');
+    echo '---------------------------', PHP_EOL;
 
 
+    $template = Websun\websun::websun_parse_template_path( [
+        'value1'    =>  1,
+        'value2'    =>  2
+    ], 'template1.html', __DIR__ . '/templates' );
+
+    echo $template , PHP_EOL;
+});
 
 
-
-
-
+SimpleRouter::start();
 

@@ -10,6 +10,13 @@
  * https://jeka.by/ask/124/mysql-ip-address/
  */
 
+/**
+lang\[\"(.*)\"\];
+to
+__lang\(\"$1\"\);
+ *
+ */
+
 namespace Arris\PHPAuth;
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -141,12 +148,12 @@ class Auth
      * @param string $email
      * @param string $password
      * @param string $repeatpassword
-     * @param array $params
+     * @param array $additional_fields
      * @param string $captcha = NULL
-     * @param bool $sendmail = NULL
+     * @param bool $use_email_activation = NULL
      * @return array $return
      */
-    public function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL, $sendmail = NULL)
+    public function register($email, $password, $repeatpassword, $additional_fields = Array(), $captcha = NULL, $use_email_activation = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -188,7 +195,7 @@ class Auth
             return $return;
         }
 
-        $addUser = $this->addUser($email, $password, $params, $sendmail);
+        $addUser = $this->addUser($email, $password, $additional_fields, $use_email_activation);
 
         if ($addUser['error'] != 0) {
             $return['message'] = $addUser['message'];
@@ -196,7 +203,7 @@ class Auth
         }
 
         $return['error'] = false;
-        $return['message'] = ($sendmail == true ? $this->lang["register_success"] : $this->lang['register_success_emailmessage_suppressed']);
+        $return['message'] = ($use_email_activation == true ? $this->lang["register_success"] : $this->lang['register_success_emailmessage_suppressed']);
 
         return $return;
 
@@ -1035,7 +1042,7 @@ class Auth
      * @param bool|false $withpassword
      * @return bool|mixed
      */
-    private function getUser($uid, $withpassword = false)
+    public function getUser($uid, $withpassword = false)
     {
         $query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = :id");
         $query->execute(['id' => $uid]);
@@ -1097,7 +1104,7 @@ VALUES (:uid, :hash, :expiredate, INET_ATON(:ip), :agent, :cookie_crc)
         $query_params = [
             'uid' => $uid,
             'hash' => $data['hash'],
-            'expire' => $data['expire'],
+            'expiredate' => $data['expire'],
             'ip' => $ip,
             'agent' => $agent,
             'cookie_crc' => $data['cookie_crc']
@@ -1146,11 +1153,11 @@ VALUES (:uid, :hash, :expiredate, INET_ATON(:ip), :agent, :cookie_crc)
      *
      * @param string $email -- email
      * @param string $password -- password
-     * @param array $params -- additional params
-     * @param boolean $sendmail -- activate email confirm or not
+     * @param array $additional_fields -- additional params
+     * @param boolean $use_email_activation -- activate email confirm or not
      * @return int $uid
      */
-    private function addUser($email, $password, $params = array(), &$sendmail)
+    private function addUser($email, $password, $additional_fields = array(), &$use_email_activation)
     {
         $return['error'] = true;
 
@@ -1165,8 +1172,8 @@ VALUES (:uid, :hash, :expiredate, INET_ATON(:ip), :agent, :cookie_crc)
 
         $email = htmlentities(strtolower($email));
 
-        if ($sendmail) {
-            $addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
+        if ($use_email_activation) {
+            $addRequest = $this->addRequest($uid, $email, "activation", $use_email_activation);
 
             if ($addRequest['error'] == 1) {
                 $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = :id");
@@ -1186,10 +1193,10 @@ VALUES (:uid, :hash, :expiredate, INET_ATON(:ip), :agent, :cookie_crc)
 
         $password = $this->getHash($password);
 
-        if (is_array($params) && count($params) > 0) {
+        if (is_array($additional_fields) && count($additional_fields) > 0) {
             $customParamsQueryArray = Array();
 
-            foreach ($params as $paramKey => $paramValue) {
+            foreach ($additional_fields as $paramKey => $paramValue) {
                 $customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
             }
 
@@ -1203,7 +1210,7 @@ VALUES (:uid, :hash, :expiredate, INET_ATON(:ip), :agent, :cookie_crc)
 
         $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?");
 
-        $bindParams = array_values(array_merge(array($email, $password, $isactive), $params, array($uid)));
+        $bindParams = array_values(array_merge(array($email, $password, $isactive), $additional_fields, array($uid)));
 
         if (!$query->execute($bindParams)) {
             $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
