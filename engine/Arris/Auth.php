@@ -71,7 +71,7 @@ class Auth implements AuthArrisInterface
 
         $db_connection = DB::getConnection( $phpauth_db_section_prefix );
 
-        $phpauth_config_class = new PHPAuthConfig( $phpauth_config , $phpauth_recaptha_config );
+        $phpauth_config_class = new PHPAuthConfig( $db_connection, $phpauth_config , $phpauth_recaptha_config );
 
         self::$phpauth = new PHPAuth( $db_connection , $phpauth_config_class );
     }

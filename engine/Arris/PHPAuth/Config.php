@@ -20,14 +20,13 @@ class Config
     protected $config;
 
     /**
-     * @param $config -- [ array of params, loaded from ini file or DB ]
-     * @param $recaptcha_config -- [
-     *      enable = 0|1
-            site_key = '...'
-            secret_key = '...'
-     * ]
-     */
-    public function __construct($config, $recaptcha_config)
+     *
+     *
+     * @param \PDO $db_connection
+     * @param array $config -- [ array of params, loaded from ini file or DB ]
+     * @param array $recaptcha_config - array of recaptcha params [ enable = 0|1 , site_key = '...' , secret_key = '...']
+     * */
+    public function __construct($db_connection, $config, $recaptcha_config)
     {
         $this->config = $config;
 

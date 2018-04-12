@@ -40,18 +40,14 @@ SimpleRouter::get('/', function(){
 
 SimpleRouter::get('/whoami', function(){
     echo 'cookie <br/>';
-    // dump($_COOKIE);
+    dump($_COOKIE);
 
-    /*if (Auth::isLogged()) {
+    if (Auth::isLogged()) {
         echo 'Auth::getCurrentUserInfo() <br>';
-        // dump( Auth::getCurrentUserInfo() );
+        dump( Auth::getCurrentUserInfo() );
     } else {
         echo 'Not logged';
-    }*/
-
-
-    Auth::getInstance()->deleteAttempts( Auth::getInstance()->getIP() );
-
+    }
 });
 
 SimpleRouter::get('/login', function(){
