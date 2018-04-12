@@ -65,9 +65,15 @@ class Auth implements AuthArrisInterface
      */
     public function __construct()
     {
-        $config = new PHPAuthConfig( App::get('phpauth') , App::get('google_recaptcha', []));
+        $phpauth_config = App::get('phpauth');
+        $phpauth_recaptha_config = App::get('google_recaptcha', []);
+        $phpauth_db_section_prefix = App::get('phpauth/db_prefix', NULL);
 
-        self::$phpauth = new PHPAuth( DB::getConnection( App::get('phpauth/db_prefix', NULL) ), $config );
+        $db_connection = DB::getConnection( $phpauth_db_section_prefix );
+
+        $phpauth_config_class = new PHPAuthConfig( $phpauth_config , $phpauth_recaptha_config );
+
+        self::$phpauth = new PHPAuth( $db_connection , $phpauth_config_class );
     }
 
 

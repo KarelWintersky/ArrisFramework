@@ -61,7 +61,7 @@ class DB
      */
     public static function getConnection($prefix = NULL):\PDO {
 
-        $key = ($prefix === NULL) ? 'NULL' : $prefix;
+        $key = empty($prefix) ? 'NULL' : $prefix;
 
         if (!self::checkInstance($prefix)) self::$_instances[$key] = new self($prefix); // EQ self::getInstance($prefix);
 
@@ -70,7 +70,7 @@ class DB
 
     public static function init($prefix = NULL) {
 
-        $key = ($prefix === NULL) ? 'NULL' : $prefix;
+        $key = empty($prefix) ? 'NULL' : $prefix;
 
         self::$_instances[$key] = new self($prefix);
     }
