@@ -10,20 +10,15 @@
 
 namespace Arris;
 
-use Arris\PHPAuth\Config as PHPAuthConfig;
-use Arris\PHPAuth\Auth as PHPAuth;
+use PHPAuth\Config as PHPAuthConfig;
+use PHPAuth\Auth as PHPAuth;
 
-interface AuthArrisInterface {
-
-    public static function getInstance():PHPAuth;
-    public static function login($email, $password, $remember = false, $captcha_response = NULL);
-    public static function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL, $sendmail = NULL);
-    public static function logout();
-    public static function isLogged();
-
-}
-
-class Auth implements AuthArrisInterface
+/**
+ *
+ * Class Auth
+ * @package Arris
+ */
+class Auth
 {
     private static $instance = NULL;
     private static $phpauth = NULL;
@@ -66,12 +61,13 @@ class Auth implements AuthArrisInterface
     public function __construct()
     {
         $phpauth_config = App::get('phpauth');
-        $phpauth_recaptha_config = App::get('google_recaptcha', []);
         $phpauth_db_section_prefix = App::get('phpauth/db_prefix', NULL);
 
         $db_connection = DB::getConnection( $phpauth_db_section_prefix );
 
-        $phpauth_config_class = new PHPAuthConfig( $db_connection, $phpauth_config , $phpauth_recaptha_config );
+        // $phpauth_config_class = new PHPAuthConfig($db_connection, 'ini', '$/.config/phpauth.ini');
+
+        $phpauth_config_class = new PHPAuthConfig($db_connection, 'array', $phpauth_config);
 
         self::$phpauth = new PHPAuth( $db_connection , $phpauth_config_class );
     }
@@ -95,9 +91,8 @@ class Auth implements AuthArrisInterface
         $auth_result = $instance->login($email, $password, $remember, $captcha_response);
 
         if (!$auth_result['error']) {
-            setcookie($instance->config->cookie_name, $auth_result['hash'], time()+$auth_result['expire'], $instance->config->cookie_path);
-            self::unsetcookie(App::get('phpauth_cookies/new_registered_userlogin'));
-            $auth_result['method'] = __METHOD__;
+            \setcookie($instance->config->cookie_name, $auth_result['hash'], time()+$auth_result['expire'], $instance->config->cookie_path);
+            self::unsetcookie(App::get('phpauth_cookies/cookie_userlogin_new_registered'));
         }
 
         return $auth_result;
@@ -121,7 +116,7 @@ class Auth implements AuthArrisInterface
         $auth_result = $instance->register($email, $password, $repeatpassword, $params, $captcha, $sendmail);
 
         if (!$auth_result['error']) {
-            setcookie(App::get('phpauth_cookies/new_registered_userlogin'), $email, time()+60*60, $instance->config->cookie_path);
+            setcookie(App::get('phpauth_cookies/cookie_userlogin_new_registered'), $email, time()+60*60, $instance->config->cookie_path);
         }
         return $auth_result;
     }
@@ -147,7 +142,7 @@ class Auth implements AuthArrisInterface
 
         if ($auth_result) {
             self::unsetcookie($instance->config->cookie_name);
-            setcookie(App::get('phpauth_cookies/last_logger_userlogin'), $userinfo['email'], time()+60*60*24, $instance->config->cookie_path);
+            setcookie(App::get('phpauth_cookies/cookie_userlogin_last_logged'), $userinfo['email'], time()+60*60*24, $instance->config->cookie_path);
             $return['error'] = false;
         }
         return $return;
@@ -186,6 +181,16 @@ class Auth implements AuthArrisInterface
     public static function __callStatic($method, $args)
     {
         return self::getInstance()->$method(...$args);
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public static function getCurrentUserInfo()
+    {
+        $instance = self::getInstance();
+        return $instance->getUser($instance->getSessionUID($instance->getSessionHash()));
     }
 
 }

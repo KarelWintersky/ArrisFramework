@@ -39,15 +39,15 @@ SimpleRouter::get('/', function(){
 });
 
 SimpleRouter::get('/whoami', function(){
-    echo 'cookie <br/>';
-    dump($_COOKIE);
+    dump('cookie', $_COOKIE);
 
     if (Auth::isLogged()) {
-        echo 'Auth::getCurrentUserInfo() <br>';
-        dump( Auth::getCurrentUserInfo() );
+        dump('Auth::getCurrentUserInfo()', Auth::getCurrentUserInfo() );
     } else {
         echo 'Not logged';
     }
+
+    dump( Auth::getInstance()->config->cookie_userlogin_new_registered );
 });
 
 SimpleRouter::get('/login', function(){

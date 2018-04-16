@@ -1,20 +1,12 @@
 <?php
-/**
- * User: Arris
- *
- * Class websun
- * Namespace: websun
- *
- * Date: 27.02.2018, time: 12:36
- */
 
-namespace Arris\Websun;
+namespace Websun;
 
 # Websun template parser by Mikhail Serov (1234ru at gmail.com)
 # http://webew.ru/articles/3609.webew
 # 2010-2017 (c)
 
-    /*
+/*
 
     0.2.0 - @KarelWintersky: added framework-namespace, added static helpers
 
@@ -266,7 +258,7 @@ namespace Arris\Websun;
     {?*a>b*}..{*a>b?*}
     {?*a>"строка"*}..{*a>"строка"*?}
     {?*a>3*}..{*a>3*?}
-    */
+*/
 
 /**
     USE inside Arris Framework
@@ -278,7 +270,7 @@ namespace Arris\Websun;
     ---- in composer.json ----
     "autoload": {
         "psr-4": {
-            "Arris\\Websun\\"   : "engine/Arris/Websun"
+            "Websun\\"   : "engine/Websun"
         }
     }
 
@@ -317,7 +309,7 @@ class websun {
      *
      * @param array $options[]
      */
-    function __construct($options) {
+    public function __construct($options) {
         $this->vars = $options['data'];
 
         if (isset($options['templates_root']) AND $options['templates_root']) // корневой каталог шаблонов
