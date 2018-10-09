@@ -27,6 +27,7 @@ class WebSunTemplate
     public $template_file;
     public $template_path;
     public $template_data;
+    public $template_real_filepath;
 
     private $render_type;
     private $http_status;
@@ -40,6 +41,7 @@ class WebSunTemplate
     {
         $this->template_file = $file;
         $this->template_path = $path;
+        $this->template_real_filepath = preg_replace('/^\$/', __ROOT__, $path) . '/' . $file;
         $this->data = [];
         $this->http_status = 200;
         $this->render_type = 'html';
@@ -56,6 +58,14 @@ class WebSunTemplate
         if ($this->render_type === 'html') {
 
             if ($this->template_path === '' && $this->template_file === '') return false;
+
+            if (!is_readable( $this->template_real_filepath )) {
+
+                //@todo: write to LOG
+                var_dump($this->template_real_filepath . " not readable ");
+
+                return NULL;
+            }
 
             return websun::websun_parse_template_path( $this->template_data, $this->template_file, $this->template_path );
 

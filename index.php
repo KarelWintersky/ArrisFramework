@@ -4,6 +4,8 @@
  * Date: 10.04.2018, time: 20:29
  */
 
+define('AF_ROOT', getenv('AF_ROOT') ?? __DIR__);
+
 define('__ROOT__', __DIR__);
 define('__CONFIG__', __ROOT__ . '/config/');
 

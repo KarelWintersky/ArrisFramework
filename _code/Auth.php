@@ -12,6 +12,7 @@ namespace Arris;
 
 use PHPAuth\Config as PHPAuthConfig;
 use PHPAuth\Auth as PHPAuth;
+use DB;
 
 /**
  *
@@ -64,8 +65,6 @@ class Auth
         $phpauth_db_section_prefix = App::get('phpauth/db_prefix', NULL);
 
         $db_connection = DB::getConnection( $phpauth_db_section_prefix );
-
-        // $phpauth_config_class = new PHPAuthConfig($db_connection, 'ini', '$/.config/phpauth.ini');
 
         $phpauth_config_class = new PHPAuthConfig($db_connection, 'array', $phpauth_config);
 
@@ -127,6 +126,9 @@ class Auth
      */
     public static function logout()
     {
+        /**
+         * @var \PHPAuth\Auth;
+         */
         $instance = self::getInstance();
 
         $return['error'] = true;

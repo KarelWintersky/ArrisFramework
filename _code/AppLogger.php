@@ -106,6 +106,11 @@ class AppLogger implements AppLoggerInterface
      */
     private static $_log;
 
+    public function __construct()
+    {
+        self::init();
+    }
+
     public static function init()
     {
         $channel = App::get('monolog/channel');
@@ -123,11 +128,6 @@ class AppLogger implements AppLoggerInterface
                 break;
             }
         }
-    }
-
-    public function __construct()
-    {
-        self::init();
     }
 
     private static function handler_file()

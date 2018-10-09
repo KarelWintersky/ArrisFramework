@@ -3,7 +3,7 @@
  * User: Karel Wintersky
  * Date: 26.08.2018, time: 14:25 Version 1.5/LIBDb
  * Date: 20.09.2018, time: 16:34 Version 2.0/ArrisFramework
- *
+ * Date: 09.10.2018, time: 06:34 Version 2.1/ArrisFramework
  */
 
 /**
@@ -17,7 +17,7 @@ interface DBConnectionInterface
      * @param null $suffix
      * @param $config
      */
-    public static function init($suffix, $config);
+    public static function init($suffix, Array $config);
 
     /**
      * Get connection config
@@ -30,10 +30,10 @@ interface DBConnectionInterface
     /**
      * Set connection config
      *
-     * @param $config
+     * @param array $config
      * @param null $suffix
      */
-    public static function setConfig($config, $suffix = NULL);
+    public static function setConfig(Array $config, $suffix = NULL);
 
     /**
      * Alias: get PDO connection
@@ -64,7 +64,7 @@ interface DBConnectionInterface
      * @param null $suffix
      * @return null|string
      */
-    public static function getTablePrefix( $suffix = NULL );
+    public static function getTablePrefix($suffix = NULL);
 
     /**
      *
@@ -122,14 +122,12 @@ interface DBConnectionInterface
 
 }
 
-
-
 /**
  * Class DB
  */
 class DB implements DBConnectionInterface
 {
-    const VERSION = '2.0/ArrisFramework';
+    const VERSION = '2.1/ArrisFramework';
 
     private static $_current_connection = null;
 
@@ -213,7 +211,7 @@ class DB implements DBConnectionInterface
      * @param null $suffix
      * @param $config
      */
-    public static function init($suffix, $config)
+    public static function init($suffix, Array $config)
     {
         $config_key = self::getKey($suffix);
         self::setConfig($config, $suffix);
@@ -238,7 +236,7 @@ class DB implements DBConnectionInterface
      * @param $config
      * @param null $suffix
      */
-    public static function setConfig($config, $suffix = NULL)
+    public static function setConfig(Array $config, $suffix = NULL)
     {
         $config_key = self::getKey($suffix);
         self::$_configs[$config_key] = $config;
@@ -255,6 +253,10 @@ class DB implements DBConnectionInterface
         return self::getInstance($suffix);
     }
 
+    /*
+    Set default connection context
+    */
+
     /**
      * Set current connection key for internal calls === setContext() ?
      *
@@ -264,6 +266,18 @@ class DB implements DBConnectionInterface
     {
         self::$_current_connection = self::getKey($suffix);
     }
+
+
+    public static function setDefaultConnection($suffix)
+    {
+        self::$_current_connection = self::getKey($suffix);
+    }
+
+    public static function getDefaultConnection()
+    {
+        return self::$_current_connection;
+    }
+
 
     /**
      * Get class instance == connection instance
@@ -280,14 +294,6 @@ class DB implements DBConnectionInterface
 
         new self($suffix);
         return self::$_instances[ $key ];
-
-        /* old :
-        $key = self::getKey($suffix);
-        if (!self::checkInstance($suffix)) {
-            self::$_instances[$key] = new self($suffix);
-        }
-        return self::$_instances[$key];
-        */
     }
 
     /**
@@ -296,7 +302,7 @@ class DB implements DBConnectionInterface
      * @param null $suffix
      * @return null|string
      */
-    public static function getTablePrefix( $suffix = NULL )
+    public static function getTablePrefix($suffix = NULL)
     {
         if (!self::checkInstance($suffix)) return NULL;
 
@@ -361,12 +367,10 @@ class DB implements DBConnectionInterface
 
         $query = "SELECT COUNT({$field}) AS rowcount FROM {$table} {$where}";
 
-        // $suff = self::$_current_connection ?? $suffix;
         $sth = self::getConnection($suffix)->query($query);
 
         return ($sth) ? $sth->fetchColumn() : null;
     }
-
     /**
      * get Last Insert ID
      *
@@ -376,6 +380,33 @@ class DB implements DBConnectionInterface
     {
         self::getConnection($suffix)->lastInsertId();
     }
+
+    /**
+     * Проверяет существование таблицы в БД
+     *
+     * @param string $table
+     * @param null $suffix
+     * @return bool
+     * @throws Exception
+     */
+    public static function checkTableExists($table = '', $suffix = NULL)
+    {
+        if (empty($table)) throw new Exception(__CLASS__ . "::" . __METHOD__ . " -> table param empty");
+
+        $query = "
+SELECT *
+FROM information_schema.tables
+WHERE table_name LIKE ':table'
+LIMIT 1;";
+        $state = self::getConnection($suffix)->prepare($query);
+        $state->execute(["table" => $table]);
+        $result = $state->fetchColumn(2);
+
+        if ($result && ($result === $table)) return true;
+        return false;
+    }
+
+
 
     /**
      * Build INSERT-query by dataset for given table
