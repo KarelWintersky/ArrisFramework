@@ -6,6 +6,8 @@
  * Date: 09.10.2018, time: 06:34 Version 2.1/ArrisFramework
  */
 
+namespace Arris;
+
 /**
  * Interface DBConnectionInterface
  */
@@ -17,7 +19,7 @@ interface DBConnectionInterface
      * @param null $suffix
      * @param $config
      */
-    public static function init($suffix, Array $config);
+    public static function init($suffix, array $config);
 
     /**
      * Get connection config
@@ -33,13 +35,13 @@ interface DBConnectionInterface
      * @param array $config
      * @param null $suffix
      */
-    public static function setConfig(Array $config, $suffix = NULL);
+    public static function setConfig(array $config, $suffix = NULL);
 
     /**
      * Alias: get PDO connection
      *
      * @param null $suffix
-     * @return PDO
+     * @return \PDO
      */
     public static function getConnection($suffix = NULL): \PDO;
 
@@ -54,7 +56,7 @@ interface DBConnectionInterface
      * Get class instance == connection instance
      *
      * @param null $suffix
-     * @return PDO
+     * @return \PDO
      */
     public static function getInstance($suffix = NULL):\PDO;
 
@@ -127,7 +129,12 @@ interface DBConnectionInterface
  */
 class DB implements DBConnectionInterface
 {
-    const VERSION = '2.1/ArrisFramework';
+    const VERSION = '2.3/ArrisFramework';
+    const CHANGELOG = <<<CHANGELOG
+2.2 : отказ от загрузки конфига из статик-класса Config, DB::init() принимает сразу суффикс + конфиг подключения.
+2.3 : если charset/charset_collate не установлены - они не применяются к базе 
+CHANGELOG;
+
 
     private static $_current_connection = null;
 
@@ -152,28 +159,25 @@ class DB implements DBConnectionInterface
     {
         $config_key = self::getKey($suffix);
 
-        $config
-            = is_null(self::getConfig($suffix))
-            ? Config::get($config_key)
-            : self::getConfig($suffix);
+        $config = self::getConfig($suffix);
 
-        $dbhost = $config['hostname'];
-        $dbname = $config['database'];
-        $dbuser = $config['username'];
-        $dbpass = $config['password'];
-        $dbport = $config['port'];
-
-        $db_charset = $config['charset'] ?? 'utf8';
-        $db_charset_collate = $config['charset_collate'] ?? 'utf8_unicode_ci';
+        $dbhost = $config['hostname'] ?? 'localhost';
+        $dbname = $config['database'] ?? 'mysql';
+        $dbuser = $config['username'] ?? 'root';
+        $dbpass = $config['password'] ?? '';
+        $dbport = $config['port'] ?? 3306;
 
         $dsl = "mysql:host={$dbhost};port={$dbport};dbname={$dbname}";
         try {
             if ($config === NULL)
-                throw new \Exception("Config section `[{$config_key}]` not declared in config workspace.\r\n", 2);
+                throw new \Exception("DB class can't find configuration data for suffix {$suffix}" . PHP_EOL, 2);
 
             $dbh = new \PDO($dsl, $dbuser, $dbpass);
 
-            $dbh->exec("SET NAMES {$db_charset} COLLATE {$db_charset_collate}");
+            if (isset($config['charset']) && isset($config['charset_collate'])) {
+                $dbh->exec("SET NAMES {$config['charset']} COLLATE {$config['charset_collate']}");
+            }
+
             $dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $dbh->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
@@ -202,16 +206,27 @@ class DB implements DBConnectionInterface
         }
 
         self::$_configs[$config_key] = $config;
-
     }
 
     /**
      * Predicted (early) initialization
      *
+     * $config must have:
+     *  'hostname' (default localhost)
+     *  'database' (default mysql)
+     *  'username' (default root)
+     *  'password' (default empty)
+     *  'port' (default 3306)
+     *
+     * optional:
+     *  'charset'
+     *  'charset_collate'
+     *
+     *
      * @param null $suffix
      * @param $config
      */
-    public static function init($suffix, Array $config)
+    public static function init($suffix, array $config)
     {
         $config_key = self::getKey($suffix);
         self::setConfig($config, $suffix);
@@ -236,7 +251,7 @@ class DB implements DBConnectionInterface
      * @param $config
      * @param null $suffix
      */
-    public static function setConfig(Array $config, $suffix = NULL)
+    public static function setConfig(array $config, $suffix = NULL)
     {
         $config_key = self::getKey($suffix);
         self::$_configs[$config_key] = $config;
@@ -246,7 +261,7 @@ class DB implements DBConnectionInterface
      * Alias: get PDO connection
      *
      * @param null $suffix
-     * @return PDO
+     * @return \PDO
      */
     public static function getConnection($suffix = NULL): \PDO
     {
@@ -283,7 +298,7 @@ class DB implements DBConnectionInterface
      * Get class instance == connection instance
      *
      * @param null $suffix
-     * @return PDO
+     * @return \PDO
      */
     public static function getInstance($suffix = NULL):\PDO
     {
@@ -387,11 +402,11 @@ class DB implements DBConnectionInterface
      * @param string $table
      * @param null $suffix
      * @return bool
-     * @throws Exception
+     * @throws \Exception
      */
     public static function checkTableExists($table = '', $suffix = NULL)
     {
-        if (empty($table)) throw new Exception(__CLASS__ . "::" . __METHOD__ . " -> table param empty");
+        if (empty($table)) throw new \Exception(__CLASS__ . "::" . __METHOD__ . " -> table param empty");
 
         $query = "
 SELECT *
